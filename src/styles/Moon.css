@@ -1,8 +1,7 @@
 .moon {
-    width: 4px;
-    height: 4px;
-    background-color: #ccc;
-    border-radius: 50%;
-    position: absolute;
-  }
-  
+  width: 6px; /* Adjust size if needed */
+  height: 6px; /* Make sure height and width are equal for round moons */
+  background-color: #ccc; /* Moon color */
+  border-radius: 50%; /* Makes moons round */
+  position: absolute;
+}
