@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Planet from './Planet.js';
+import Planet from './Planet';
 import '../styles/SolarSystem.css';
 
 const planets = [
@@ -16,41 +16,55 @@ const planets = [
 const SolarSystem = () => {
   const [selectedPlanet, setSelectedPlanet] = useState(null);
 
-  const handlePlanetClick = (planet) => {
+  // Handle when a planet is clicked
+  const handlePlanetClick = (planetName) => {
+    const planet = planets.find((p) => p.name === planetName);
     setSelectedPlanet(planet);
+    console.log(`Clicked on ${planetName}`);
   };
 
+  // Handle going back to the solar system view
   const handleBackClick = () => {
     setSelectedPlanet(null);
+    console.log('Back to Solar System');
   };
 
   return (
     <div className="solar-system">
+      {/* If no planet is selected */}
       {!selectedPlanet && (
         <>
           <div className="sun"></div>
           {planets.map((planet) => (
             <React.Fragment key={planet.name}>
-              <div 
-                className="orbit" 
+              {/* Orbit */}
+              <div
+                className="orbit"
                 style={{
                   width: planet.orbitRadius * 2,
                   height: planet.orbitRadius * 2,
                 }}
               ></div>
+
+              {/* Planet */}
               <Planet
                 {...planet}
-                onClick={() => handlePlanetClick(planet)}
+                onClick={handlePlanetClick} // Pass the click handler
               />
             </React.Fragment>
           ))}
         </>
       )}
+
+      {/* If a planet is selected */}
       {selectedPlanet && (
         <div className="planet-view">
           <h2>{selectedPlanet.name}</h2>
+          <p>Orbit Radius: {selectedPlanet.orbitRadius} px</p>
+          <p>Size (Diameter): {selectedPlanet.size} px</p>
+          <p>Moons Count: {selectedPlanet.moons}</p>
+          <p>Orbital Period (days): {selectedPlanet.orbitalPeriod}</p>
           <button onClick={handleBackClick}>Back to Solar System</button>
-          {/* Add detailed planet view components here */}
         </div>
       )}
     </div>
