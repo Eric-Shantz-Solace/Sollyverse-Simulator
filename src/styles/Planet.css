@@ -1,0 +1,15 @@
+.planet {
+    position: absolute;
+    border-radius: 50%;
+  }
+  
+  .planet-label {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  
