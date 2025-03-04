@@ -3,13 +3,12 @@ import Planet from "./Planet";
 import "../styles/SolarSystem.css";
 
 const planets = [
+  // Planet data remains unchanged
   {
     name: "Mercury",
     orbitRadius: 100,
     size: 10,
-    moons: [
-      { name: "Moon1" },
-    ],
+    moons: [{ name: "Moon1" }],
     color: "#8C7E6A",
     orbitalPeriod: 1500,
   },
@@ -25,9 +24,7 @@ const planets = [
     name: "Earth",
     orbitRadius: 200,
     size: 16,
-    moons: [
-      { name: "Moon1" },
-    ],
+    moons: [{ name: "Moon1" }],
     color: "#6B93D6",
     orbitalPeriod: 2700,
   },
@@ -96,8 +93,8 @@ const planets = [
 ];
 
 const SolarSystem = () => {
-  const [selectedPlanet, setSelectedPlanet] = useState(null);
   const [scaleFactor, setScaleFactor] = useState(1);
+  const [isAnimating, setIsAnimating] = useState(true); // New state to control animation
 
   useEffect(() => {
     const viewportHeight = window.innerHeight;
@@ -107,46 +104,30 @@ const SolarSystem = () => {
   }, []);
 
   const handlePlanetClick = (planetName) => {
-    const planet = planets.find((p) => p.name === planetName);
-    setSelectedPlanet(planet);
-    console.log(`Clicked on ${planetName}`);
-  };
-
-  const handleBackClick = () => {
-    setSelectedPlanet(null);
-    console.log("Back to Solar System");
+    setIsAnimating((prev) => !prev); // Toggle animation state
+    console.log(`Toggled animation for ${planetName}`);
   };
 
   return (
     <div className="solar-system">
-      {!selectedPlanet && (
-        <>
-          <div className="sun"></div>
-          {planets.map((planet) => (
-            <React.Fragment key={planet.name}>
-              <div
-                className="orbit"
-                style={{
-                  width: planet.orbitRadius * 2 * scaleFactor,
-                  height: planet.orbitRadius * 2 * scaleFactor,
-                }}
-              ></div>
-              <Planet {...planet} onClick={handlePlanetClick} scaleFactor={scaleFactor} />
-            </React.Fragment>
-          ))}
-        </>
-      )}
-
-      {selectedPlanet && (
-        <div className="planet-view">
-          <h2>{selectedPlanet.name}</h2>
-          <p>Orbit Radius: {selectedPlanet.orbitRadius} px</p>
-          <p>Size (Diameter): {selectedPlanet.size} px</p>
-          <p>Moons Count: {selectedPlanet.moons.length}</p>
-          <p>Orbital Period (days): {selectedPlanet.orbitalPeriod}</p>
-          <button onClick={handleBackClick}>Back to Solar System</button>
-        </div>
-      )}
+      <div className="sun"></div>
+      {planets.map((planet) => (
+        <React.Fragment key={planet.name}>
+          <div
+            className="orbit"
+            style={{
+              width: planet.orbitRadius * 2 * scaleFactor,
+              height: planet.orbitRadius * 2 * scaleFactor,
+            }}
+          ></div>
+          <Planet
+            {...planet}
+            onClick={handlePlanetClick}
+            scaleFactor={scaleFactor}
+            isAnimating={isAnimating} // Pass animation state to Planet
+          />
+        </React.Fragment>
+      ))}
     </div>
   );
 };

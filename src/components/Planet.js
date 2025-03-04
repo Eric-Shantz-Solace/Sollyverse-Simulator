@@ -10,41 +10,41 @@ const Planet = ({
   orbitalPeriod,
   onClick,
   scaleFactor,
+  isAnimating, // New prop to control animation
 }) => {
   const [angle, setAngle] = useState(Math.random() * Math.PI * 2);
-  const [moonAngles, setMoonAngles] = useState(moons.map(() => Math.random() * Math.PI * 2)); // Initial angles for moons
-  const angleRef = useRef(angle); // To keep track of angle for smooth updates
-  const moonAnglesRef = useRef(moonAngles); // To keep track of moon angles
-  const requestRef = useRef(null); // To store the requestAnimationFrame ID
+  const [moonAngles, setMoonAngles] = useState(moons.map(() => Math.random() * Math.PI * 2));
+  const angleRef = useRef(angle);
+  const moonAnglesRef = useRef(moonAngles);
+  const requestRef = useRef(null);
 
-  // Speed factor for smoother orbiting of the planet
   const planetSpeed = (2 * Math.PI) / orbitalPeriod;
-
-  // Global moon speed multiplier
-  const moonSpeedMultiplier = 0.3; // Increase this value for faster moons
+  const moonSpeedMultiplier = 0.3;
 
   useEffect(() => {
     const animate = () => {
-      // Update the planet's angle for smooth movement
-      angleRef.current += planetSpeed;
-      setAngle(angleRef.current); // Update planet position
+      if (isAnimating) {
+        // Update planet angle
+        angleRef.current += planetSpeed;
+        setAngle(angleRef.current);
 
-      // Update the moon's angles for smooth orbiting
-      const updatedMoonAngles = moonAnglesRef.current.map((moonAngle, index) => {
-        const moonSpeed = 0.1 * moonSpeedMultiplier; // Constant moon speed multiplier
-        return moonAngle + moonSpeed; // Update the moon's angle
-      });
+        // Update moon angles
+        const updatedMoonAngles = moonAnglesRef.current.map((moonAngle) => {
+          const moonSpeed = 0.1 * moonSpeedMultiplier;
+          return moonAngle + moonSpeed;
+        });
 
-      setMoonAngles(updatedMoonAngles); // Update moon angles
-      moonAnglesRef.current = updatedMoonAngles; // Update reference to keep in sync
+        setMoonAngles(updatedMoonAngles);
+        moonAnglesRef.current = updatedMoonAngles;
+      }
 
-      requestRef.current = requestAnimationFrame(animate); // Request the next frame
+      requestRef.current = requestAnimationFrame(animate);
     };
 
-    requestRef.current = requestAnimationFrame(animate); // Start the animation loop
+    requestRef.current = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(requestRef.current); // Cleanup on component unmount
-  }, [orbitalPeriod]);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, [isAnimating, orbitalPeriod, planetSpeed]);
 
   const x = Math.cos(angle) * orbitRadius * scaleFactor;
   const y = Math.sin(angle) * orbitRadius * scaleFactor;
@@ -56,9 +56,7 @@ const Planet = ({
         width: size * scaleFactor,
         height: size * scaleFactor,
         backgroundColor: color,
-        transform: `translate(calc(50vw + ${x}px - ${
-          size / 2
-        }px), calc(50vh + ${y}px - ${size / 2}px))`,
+        transform: `translate(calc(50vw + ${x}px - ${size / 2}px), calc(50vh + ${y}px - ${size / 2}px))`,
         position: "absolute",
         cursor: "pointer",
         zIndex: 10,
@@ -67,10 +65,9 @@ const Planet = ({
     >
       <div className="planet-label">{name}</div>
 
-      {/* Render moons */}
       {moons.map((moon, index) => {
-        const moonAngle = moonAngles[index]; // Get the moon's updated angle
-        const moonX = Math.cos(moonAngle) * (size / 2 + 10); // Orbit moons around the planet
+        const moonAngle = moonAngles[index];
+        const moonX = Math.cos(moonAngle) * (size / 2 + 10);
         const moonY = Math.sin(moonAngle) * (size / 2 + 10);
 
         return (
@@ -78,12 +75,12 @@ const Planet = ({
             key={index}
             className="moon"
             style={{
-              left: `calc(50% + ${moonX}px - 3px)`, // Center moons around the planet
-              top: `calc(50% + ${moonY}px - 3px)`, // Center moons around the planet
-              width: 6, // Moon size
+              left: `calc(50% + ${moonX}px - 3px)`,
+              top: `calc(50% + ${moonY}px - 3px)`,
+              width: 6,
               height: 6,
-              backgroundColor: "#ccc", // Moon color
-              borderRadius: "50%", // Make moons round
+              backgroundColor: "#ccc",
+              borderRadius: "50%",
               position: "absolute",
             }}
           />
