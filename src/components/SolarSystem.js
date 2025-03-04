@@ -90,9 +90,7 @@ const SolarSystem = () => {
 
   useEffect(() => {
     const viewportHeight = window.innerHeight;
-    const maxOrbitRadius = Math.max(
-      ...planets.map((planet) => planet.orbitRadius)
-    );
+    const maxOrbitRadius = Math.max(...planets.map((planet) => planet.orbitRadius));
     const factor = (viewportHeight * 0.9) / (maxOrbitRadius * 2);
     setScaleFactor(factor);
   }, []);
@@ -121,7 +119,7 @@ const SolarSystem = () => {
     // Set zoom complete after animation
     setTimeout(() => {
       setIsZoomComplete(true);
-    }, 1000); // This should match the transition duration in CSS
+    }, 1000); // Match transition duration in CSS
   };
 
   const handleBackClick = () => {
@@ -132,49 +130,49 @@ const SolarSystem = () => {
     setTimeout(() => {
       setIsAnimating(true);
       setZoomedPlanet(null);
-    }, 1000); // This should match the transition duration in CSS
+    }, 1000); // Match transition duration in CSS
   };
 
   return (
-    <div
-      className="solar-system"
-      style={{
-        transform: `scale(${zoomLevel})`,
-        transition: "transform 1s ease-in-out",
-        transformOrigin: zoomedPlanet
-          ? `${zoomPosition.x}px ${zoomPosition.y}px`
-          : "center center",
-        overflow: zoomLevel > 1 ? "hidden" : "visible",
-      }}
-    >
-      <div className="sun"></div>
-      {planets.map((planet) => (
-        <React.Fragment key={planet.name}>
-          <div
-            className="orbit"
-            style={{
-              width: planet.orbitRadius * 2 * scaleFactor,
-              height: planet.orbitRadius * 2 * scaleFactor,
-            }}
-          ></div>
-          <Planet
-            {...planet}
-            onClick={handlePlanetClick}
-            scaleFactor={scaleFactor}
-            isAnimating={isAnimating}
-            isZoomed={zoomedPlanet?.name === planet.name}
-          />
-        </React.Fragment>
-      ))}
+    <>
+      {/* Solar System Container */}
+      <div 
+        className="solar-system" 
+        style={{
+          transform: `scale(${zoomLevel})`,
+          transition: 'transform 1s ease-in-out',
+          transformOrigin: zoomedPlanet ? `${zoomPosition.x}px ${zoomPosition.y}px` : 'center center',
+          overflow: zoomLevel > 1 ? "hidden" : "visible",
+        }}
+      >
+        <div className="sun"></div>
+        {planets.map((planet) => (
+          <React.Fragment key={planet.name}>
+            <div
+              className="orbit"
+              style={{
+                width: planet.orbitRadius * 2 * scaleFactor,
+                height: planet.orbitRadius * 2 * scaleFactor,
+              }}
+            ></div>
+            <Planet
+              {...planet}
+              onClick={handlePlanetClick}
+              scaleFactor={scaleFactor}
+              isAnimating={isAnimating}
+              isZoomed={zoomedPlanet?.name === planet.name}
+            />
+          </React.Fragment>
+        ))}
+      </div>
 
+      {/* Back Button Outside of Solar System */}
       {isZoomComplete && (
-        <div className="back-button-container">
-          <button onClick={handleBackClick} className="back-button">
-            Back to Solar System
-          </button>
-        </div>
+        <button onClick={handleBackClick} className="back-button">
+          Back to Sollyverse
+        </button>
       )}
-    </div>
+    </>
   );
 };
 
