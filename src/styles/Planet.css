@@ -1,15 +1,20 @@
 .planet {
-    position: absolute;
-    border-radius: 50%;
-  }
-  
-  .planet-label {
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-  
+  position: absolute;
+}
+
+.planet.zoomed {
+  box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.8); /* Add a glow effect */
+}
+
+.planet-label {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: white;
+}
+
+.moon {
+  position: absolute;
+}

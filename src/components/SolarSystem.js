@@ -3,7 +3,6 @@ import Planet from "./Planet";
 import "../styles/SolarSystem.css";
 
 const planets = [
-  // Planet data remains unchanged
   {
     name: "Mercury",
     orbitRadius: 100,
@@ -94,7 +93,10 @@ const planets = [
 
 const SolarSystem = () => {
   const [scaleFactor, setScaleFactor] = useState(1);
-  const [isAnimating, setIsAnimating] = useState(true); // New state to control animation
+  const [isAnimating, setIsAnimating] = useState(true);
+  const [zoomedPlanet, setZoomedPlanet] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const viewportHeight = window.innerHeight;
@@ -103,13 +105,36 @@ const SolarSystem = () => {
     setScaleFactor(factor);
   }, []);
 
-  const handlePlanetClick = (planetName) => {
-    setIsAnimating((prev) => !prev); // Toggle animation state
-    console.log(`Toggled animation for ${planetName}`);
+  const handlePlanetClick = (planetName, x, y) => {
+    const selectedPlanet = planets.find((p) => p.name === planetName);
+    setIsAnimating(false);
+    setZoomedPlanet(selectedPlanet);
+    setZoomPosition({ x, y });
+    
+    // Start zoom animation
+    setTimeout(() => setZoomLevel(5), 50); // Adjust zoom level as needed
+  };
+
+  const handleBackClick = () => {
+    // Start zoom out animation
+    setZoomLevel(1);
+    
+    // Wait for zoom out animation to complete before resetting state
+    setTimeout(() => {
+      setIsAnimating(true);
+      setZoomedPlanet(null);
+    }, 1000); // This should match the transition duration in CSS
   };
 
   return (
-    <div className="solar-system">
+    <div 
+      className="solar-system" 
+      style={{
+        transform: `scale(${zoomLevel})`,
+        transition: 'transform 1s ease-in-out',
+        transformOrigin: zoomedPlanet ? `${zoomPosition.x}px ${zoomPosition.y}px` : 'center center'
+      }}
+    >
       <div className="sun"></div>
       {planets.map((planet) => (
         <React.Fragment key={planet.name}>
@@ -124,10 +149,22 @@ const SolarSystem = () => {
             {...planet}
             onClick={handlePlanetClick}
             scaleFactor={scaleFactor}
-            isAnimating={isAnimating} // Pass animation state to Planet
+            isAnimating={isAnimating}
+            isZoomed={zoomedPlanet?.name === planet.name}
           />
         </React.Fragment>
       ))}
+
+      {zoomedPlanet && (
+        <div className="planet-info" style={{ opacity: zoomLevel === 5 ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}>
+          <h2>{zoomedPlanet.name}</h2>
+          <p>Orbit Radius: {zoomedPlanet.orbitRadius} px</p>
+          <p>Size (Diameter): {zoomedPlanet.size} px</p>
+          <p>Moons Count: {zoomedPlanet.moons.length}</p>
+          <p>Orbital Period (days): {zoomedPlanet.orbitalPeriod}</p>
+          <button onClick={handleBackClick}>Back to Solar System</button>
+        </div>
+      )}
     </div>
   );
 };

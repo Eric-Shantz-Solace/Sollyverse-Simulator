@@ -10,7 +10,8 @@ const Planet = ({
   orbitalPeriod,
   onClick,
   scaleFactor,
-  isAnimating, // New prop to control animation
+  isAnimating,
+  isZoomed,
 }) => {
   const [angle, setAngle] = useState(Math.random() * Math.PI * 2);
   const [moonAngles, setMoonAngles] = useState(moons.map(() => Math.random() * Math.PI * 2));
@@ -44,48 +45,53 @@ const Planet = ({
     requestRef.current = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(requestRef.current);
-  }, [isAnimating, orbitalPeriod, planetSpeed]);
+  }, [isAnimating, planetSpeed]);
 
-  const x = Math.cos(angle) * orbitRadius * scaleFactor;
-  const y = Math.sin(angle) * orbitRadius * scaleFactor;
+  // Calculate position of the planet
+  const x = Math.cos(angle) * orbitRadius * scaleFactor + window.innerWidth / 2;
+  const y = Math.sin(angle) * orbitRadius * scaleFactor + window.innerHeight / 2;
 
   return (
     <div
-      className="planet"
+      className={`planet ${isZoomed ? "zoomed" : ""}`}
       style={{
         width: size * scaleFactor,
         height: size * scaleFactor,
         backgroundColor: color,
-        transform: `translate(calc(50vw + ${x}px - ${size / 2}px), calc(50vh + ${y}px - ${size / 2}px))`,
+        transform: `translate(${x}px, ${y}px)`,
         position: "absolute",
         cursor: "pointer",
-        zIndex: 10,
+        borderRadius: "50%",
+        zIndex: isZoomed ? 1000 : 10,
+        transition: isZoomed ? "all 1s ease-in-out" : "none",
       }}
-      onClick={() => onClick(name)}
+      onClick={() => onClick(name, x, y)}
     >
-      <div className="planet-label">{name}</div>
+      {!isZoomed && <div className="planet-label">{name}</div>}
 
-      {moons.map((moon, index) => {
-        const moonAngle = moonAngles[index];
-        const moonX = Math.cos(moonAngle) * (size / 2 + 10);
-        const moonY = Math.sin(moonAngle) * (size / 2 + 10);
+      {/* Render moons */}
+      {!isZoomed &&
+        moons.map((moon, index) => {
+          const moonAngle = moonAngles[index];
+          const moonX = Math.cos(moonAngle) * (size / 2 + 10);
+          const moonY = Math.sin(moonAngle) * (size / 2 + 10);
 
-        return (
-          <div
-            key={index}
-            className="moon"
-            style={{
-              left: `calc(50% + ${moonX}px - 3px)`,
-              top: `calc(50% + ${moonY}px - 3px)`,
-              width: 6,
-              height: 6,
-              backgroundColor: "#ccc",
-              borderRadius: "50%",
-              position: "absolute",
-            }}
-          />
-        );
-      })}
+          return (
+            <div
+              key={index}
+              className="moon"
+              style={{
+                left: `calc(50% + ${moonX}px - 3px)`,
+                top: `calc(50% + ${moonY}px - 3px)`,
+                width: "6px",
+                height: "6px",
+                backgroundColor: "#ccc",
+                borderRadius: "50%",
+                position: "absolute",
+              }}
+            />
+          );
+        })}
     </div>
   );
 };
