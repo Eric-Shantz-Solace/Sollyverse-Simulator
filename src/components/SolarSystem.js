@@ -31,10 +31,7 @@ const planets = [
     name: "Mars",
     orbitRadius: 250,
     size: 12,
-    moons: [
-      { name: "Moon1" },
-      { name: "Moon2" },
-    ],
+    moons: [{ name: "Moon1" }, { name: "Moon2" }],
     color: "#C1440E",
     orbitalPeriod: 3200,
   },
@@ -69,11 +66,7 @@ const planets = [
     name: "Uranus",
     orbitRadius: 550,
     size: 25,
-    moons: [
-      { name: "Moon1" },
-      { name: "Moon2" },
-      { name: "Moon3" },
-    ],
+    moons: [{ name: "Moon1" }, { name: "Moon2" }, { name: "Moon3" }],
     color: "#9DB4C0",
     orbitalPeriod: 5200,
   },
@@ -81,11 +74,7 @@ const planets = [
     name: "Neptune",
     orbitRadius: 650,
     size: 24,
-    moons: [
-      { name: "Moon1" },
-      { name: "Moon2" },
-      { name: "Moon3" },
-    ],
+    moons: [{ name: "Moon1" }, { name: "Moon2" }, { name: "Moon3" }],
     color: "#3E54E8",
     orbitalPeriod: 5700,
   },
@@ -97,28 +86,48 @@ const SolarSystem = () => {
   const [zoomedPlanet, setZoomedPlanet] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [isZoomComplete, setIsZoomComplete] = useState(false);
 
   useEffect(() => {
     const viewportHeight = window.innerHeight;
-    const maxOrbitRadius = Math.max(...planets.map((planet) => planet.orbitRadius));
+    const maxOrbitRadius = Math.max(
+      ...planets.map((planet) => planet.orbitRadius)
+    );
     const factor = (viewportHeight * 0.9) / (maxOrbitRadius * 2);
     setScaleFactor(factor);
   }, []);
+
+  useEffect(() => {
+    if (zoomLevel > 1) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "visible";
+    }
+
+    return () => {
+      document.body.style.overflow = "visible";
+    };
+  }, [zoomLevel]);
 
   const handlePlanetClick = (planetName, x, y) => {
     const selectedPlanet = planets.find((p) => p.name === planetName);
     setIsAnimating(false);
     setZoomedPlanet(selectedPlanet);
     setZoomPosition({ x, y });
-    
+
     // Start zoom animation
-    setTimeout(() => setZoomLevel(5), 50); // Adjust zoom level as needed
+    setZoomLevel(7);
+
+    // Set zoom complete after animation
+    setTimeout(() => {
+      setIsZoomComplete(true);
+    }, 1000); // This should match the transition duration in CSS
   };
 
   const handleBackClick = () => {
-    // Start zoom out animation
     setZoomLevel(1);
-    
+    setIsZoomComplete(false);
+
     // Wait for zoom out animation to complete before resetting state
     setTimeout(() => {
       setIsAnimating(true);
@@ -127,12 +136,15 @@ const SolarSystem = () => {
   };
 
   return (
-    <div 
-      className="solar-system" 
+    <div
+      className="solar-system"
       style={{
         transform: `scale(${zoomLevel})`,
-        transition: 'transform 1s ease-in-out',
-        transformOrigin: zoomedPlanet ? `${zoomPosition.x}px ${zoomPosition.y}px` : 'center center'
+        transition: "transform 1s ease-in-out",
+        transformOrigin: zoomedPlanet
+          ? `${zoomPosition.x}px ${zoomPosition.y}px`
+          : "center center",
+        overflow: zoomLevel > 1 ? "hidden" : "visible",
       }}
     >
       <div className="sun"></div>
@@ -155,14 +167,11 @@ const SolarSystem = () => {
         </React.Fragment>
       ))}
 
-      {zoomedPlanet && (
-        <div className="planet-info" style={{ opacity: zoomLevel === 5 ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}>
-          <h2>{zoomedPlanet.name}</h2>
-          <p>Orbit Radius: {zoomedPlanet.orbitRadius} px</p>
-          <p>Size (Diameter): {zoomedPlanet.size} px</p>
-          <p>Moons Count: {zoomedPlanet.moons.length}</p>
-          <p>Orbital Period (days): {zoomedPlanet.orbitalPeriod}</p>
-          <button onClick={handleBackClick}>Back to Solar System</button>
+      {isZoomComplete && (
+        <div className="back-button-container">
+          <button onClick={handleBackClick} className="back-button">
+            Back to Solar System
+          </button>
         </div>
       )}
     </div>
